@@ -272,4 +272,53 @@ class Auth_Jelly extends Auth {
 		return $current;
 	}
 
+    /**
+	 * Does the reverse of unique_key_exists() by triggering error if username exists.
+	 * Validation callback.
+	 *
+	 * @param   Validate  Validate object
+	 * @param   string    field name
+	 * @return  void
+	 */
+	public static function username_available(Validate $array, $field)
+	{
+		if (self::unique_key_exists($array[$field]))
+		{
+			$array->error($field, 'username_available', array($array[$field]));
+		}
+	}
+
+	/**
+	 * Does the reverse of unique_key_exists() by triggering error if email exists.
+	 * Validation callback.
+	 *
+	 * @param   Validate  Validate object
+	 * @param   string    field name
+	 * @return  void
+	 */
+	public static function email_available(Validate $array, $field)
+	{
+		if (self::unique_key_exists($array[$field]))
+		{
+			$array->error($field, 'email_available', array($array[$field]));
+		}
+	}
+
+	/**
+	 * Tests if a unique key value exists in the database.
+	 *
+	 * @param   mixed    the value to test
+	 * @return  boolean
+	 */
+	public static function unique_key_exists($value)
+	{
+		return (bool)
+            Jelly::select('User')
+                ->select(DB::expr('COUNT(*) as total'))
+    			->where(Validate::email($value) ? 'email' : 'username', '=', $value)
+                ->limit(1)
+    			->execute()
+                ->get('total');
+	}
+
 } // End Auth_Jelly_Driver

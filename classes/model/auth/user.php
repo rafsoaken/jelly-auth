@@ -95,6 +95,9 @@ class Model_Auth_User extends Jelly_Model
 			$val = (int) $role;
 		}
 
+        if( is_null($this->roles) )
+            return FALSE;
+
 		foreach ($this->roles as $user_role)
 		{	
 			if ($user_role->{$key} === $val)
